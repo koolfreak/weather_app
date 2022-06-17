@@ -1,0 +1,8 @@
+# created by virtualenv automatically
+bin
+.idea
+/.idea/*
+*.iml
+*.cfg
+lib
+__pycache__
