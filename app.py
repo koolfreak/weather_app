@@ -47,6 +47,7 @@ def forecast():
             forecast_weather.append(_tmp)
 
         data["forecast_weather"] = forecast_weather
+        data["success"] = True
         return jsonify(data)
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)})

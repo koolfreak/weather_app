@@ -124,10 +124,14 @@ var vueApp = new Vue({
                 .then( res => res.json())
                 .then(res => {
                     $('#progressId').hide()
-                    this.currentForecast = res.current_weather;
-                    this.showCurrentForecast = true
-                    this.forecastsList = res.forecast_weather;
-                    this.show24Forecast = true
+                    if (res.success) {
+                        this.currentForecast = res.current_weather;
+                        this.showCurrentForecast = true
+                        this.forecastsList = res.forecast_weather;
+                        this.show24Forecast = true
+                    }else{
+                        alert(res.message)
+                    }
                 })
                 .catch(error => {
                     $('#progressId').hide()
