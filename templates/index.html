@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>weather</title>
+    <title>Weather App</title>
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
 
@@ -12,7 +12,7 @@
 
     <!-- Latest compiled JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
-    {#    <link rel="stylesheet" href="{{ url_for('static', filename= 'css/style.css') }}">#}
+    <link rel="stylesheet" href="{{ url_for('static', filename= 'css/forecast.css') }}">
     <script src="{{ url_for('static', filename= 'js/vue-2.6.10.min.js') }}"></script>
 
 </head>
@@ -23,31 +23,97 @@
 </nav>
 <br />
 <br />
-<center class="row">
-    <form method="post" class="col-md-6 col-md-offset-3">
-        <div class="input-group">
 
-            <select class="form-control" name="country" id="country">
-                <option value="">Select Country</option>
-                {% for country in countries %}
-                    {% for key, value in country.items() %}
-                        <option value="{{ value }}">{{ key }}</option>
+
+<div class="row" id="vueApp" >
+
+    <div class="row">
+        <div  class="col-md-6 col-md-offset-3">
+            <div class="input-group" style="margin: 10px 0 10px 0;">
+                <select class="form-control" @change="selectedCountry($event)">
+                    <option value="">Select Country</option>
+                    {% for country in countries %}
+                        {% for key, value in country.items() %}
+                            <option value="{{ value }}">{{ key }}</option>
+                        {% endfor %}
                     {% endfor %}
-                {% endfor %}
-            </select>
+                </select>
+            </div>
+        </div>
 
-            <form>
-</center>
-<div class="row">
+        <div class="row" id="progressId" style="display: none;">
+            <div  class="col-md-6 col-md-offset-3">
+                <div class="progress">
+                    <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
 
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+
+    <div class="row" >
+
+        <div  class="col-md-12 col-md-offset-3" style="margin-top: 20px;">
+            <div class="col-md-3" v-show="showCurrentForecast">
+
+                    <div class="col-md-12 col-sm-12 item card border" >
+                        <div class="item-card card-block">
+                            <h4 class="card-title text-center">Current Weather Forecast</h4>
+                            <div class="col-md-6 col-sm-6">
+                                <img :src="currentForecast.icon" class="text-center" :alt="currentForecast.description">
+                            </div>
+                            <div class="col-md-6 col-sm-6" style="width: max-content;">
+                                <h5 class="item-card-title mt-3 mb-3">[[ currentForecast.temp ]] &#8451;</h5>
+                                <p class="card-text">[[ currentForecast.description ]]</p>
+                            </div>
+                        </div>
+                    </div>
+
+            </div>
+            <div class="col-md-3" v-show="show24Forecast">
+                <label>Next 4 days Weather Forecast</label>
+                <div class="row">
+
+                    <div v-for="(fcast, index) in forecastsList" :key="index"
+                            class="col-md-12 col-sm-12 card border" style="margin-top: 10px;margin-bottom: 10px;">
+                        <h4 class="card-title text-center">[[ fcast.date_time ]]</h4>
+                        <div class="col-md-6 col-sm-6">
+                            <img :src="fcast.icon" class="text-center" :alt="fcast.description">
+                        </div>
+                        <div class="col-md-6 col-sm-6" style="width: max-content;">
+                            <h5 class="item-card-title mt-3 mb-3" style="vertical-align: middle">[[ fcast.temp ]] &#8451;</h5>
+                            <p class="card-text">[[ fcast.description ]]</p>
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
 </div>
 
 <script type="text/javascript">
-
-    $(document).ready(function () {
-
-        $('#country').change( function() {
-            const latLong = $(this).val();
+var vueApp = new Vue({
+    el: '#vueApp',
+    delimiters: ['[[', ']]'],
+    data: {
+        showCurrentForecast: false,
+        show24Forecast: false,
+        currentForecast: {},
+        forecastsList: []
+    },
+    methods: {
+        selectedCountry(event){
+            let latLong = event.target.value;
+            $('#progressId').show()
             fetch('/forecast', {
                 method: 'post',
                 body: JSON.stringify({ country: latLong }),
@@ -57,14 +123,20 @@
             })
                 .then( res => res.json())
                 .then(res => {
-                    console.log(res)
+                    $('#progressId').hide()
+                    this.currentForecast = res.current_weather;
+                    this.showCurrentForecast = true
+                    this.forecastsList = res.forecast_weather;
+                    this.show24Forecast = true
                 })
                 .catch(error => {
-                    console.log(error)
+                    $('#progressId').hide()
+                    alert(error)
                 })
-        })
 
-    });
+        }
+    }
+});
 </script>
 </body>
 </html>

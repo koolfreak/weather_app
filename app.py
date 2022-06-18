@@ -29,7 +29,7 @@ def forecast():
         current_source = http_client.urlopen(current_weather_url).read()
         _curr_data = json.loads(current_source)
         _current = dict()
-        _current["description"] = _curr_data['weather'][0]['description']
+        _current["description"] = str(_curr_data['weather'][0]['description']).capitalize()
         _current["icon"] = "https://www.weatherbit.io/static/img/icons/t"+_curr_data['weather'][0]['icon']+".png"
         _current["temp"] = _curr_data['main']['temp']
         data['current_weather'] = _current
@@ -40,7 +40,7 @@ def forecast():
         forecast_weather = list()
         for weather in forecast_list:
             _tmp = dict()
-            _tmp["description"] = weather['weather'][0]['description']
+            _tmp["description"] = str(weather['weather'][0]['description']).capitalize()
             _tmp["icon"] = "https://www.weatherbit.io/static/img/icons/t"+weather['weather'][0]['icon']+".png"
             _tmp["temp"] = weather['main']['temp']
             _tmp["date_time"] = datetime.fromtimestamp(weather['dt'])
